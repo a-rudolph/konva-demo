@@ -9,6 +9,7 @@ type Shape = {
 
 function App() {
   const [coords, setCoords] = useState<Shape["points"]>([]);
+  const [image, setImage] = useState<string | null>(null);
 
   const stageRef = useRef(null);
 
@@ -23,6 +24,18 @@ function App() {
     setCoords([]);
   };
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImage(reader.result as string);
+        setCoords([]);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <>
       <div
@@ -30,14 +43,25 @@ function App() {
           display: "flex",
           justifyContent: "center",
           gap: 16,
+          marginBottom: 16,
         }}
       >
+        <input
+          id="file-upload"
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+          style={{ display: "none" }}
+        />
+        <label htmlFor="file-upload" className="upload">
+          Upload Image
+        </label>
         <button onClick={undo}>Undo</button>
         <button onClick={clear}>Clear</button>
       </div>
       <div style={{ position: "relative" }}>
         <img
-          src={BuildingImage}
+          src={image || BuildingImage}
           height={height}
           width={width}
           style={{ objectFit: "cover" }}
