@@ -11,10 +11,10 @@ function App() {
   const [coords, setCoords] = useState<Shape["points"]>([]);
   const [image, setImage] = useState<string | null>(null);
 
-  const stageRef = useRef(null);
+  const [height, setHeight] = useState(600);
+  const [width, setWidth] = useState(800);
 
-  const height = 600;
-  const width = 800;
+  const stageRef = useRef(null);
 
   const undo = () => {
     setCoords((prev) => prev.slice(0, -1));
@@ -29,21 +29,33 @@ function App() {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setImage(reader.result as string);
+        const imageUrl = reader.result as string;
+        setImage(imageUrl);
         setCoords([]);
+
+        const img = new Image();
+        img.onload = () => {
+          const imageWidth = img.width;
+          const imageHeight = img.height;
+
+          setHeight(imageHeight);
+          setWidth(imageWidth);
+        };
+        img.src = imageUrl;
       };
       reader.readAsDataURL(file);
     }
   };
 
   return (
-    <>
+    <div
+      style={{ display: "flex", flexDirection: "column", gap: 16, padding: 16 }}
+    >
       <div
         style={{
           display: "flex",
           justifyContent: "center",
           gap: 16,
-          marginBottom: 16,
         }}
       >
         <input
@@ -59,7 +71,7 @@ function App() {
         <button onClick={undo}>Undo</button>
         <button onClick={clear}>Clear</button>
       </div>
-      <div style={{ position: "relative" }}>
+      <div style={{ position: "relative", border: "2px solid lightgrey" }}>
         <img
           src={image || BuildingImage}
           height={height}
@@ -133,7 +145,7 @@ function App() {
           </Layer>
         </Stage>
       </div>
-    </>
+    </div>
   );
 }
 
