@@ -19,9 +19,22 @@ function App() {
     setCoords((prev) => prev.slice(0, -1));
   };
 
+  const clear = () => {
+    setCoords([]);
+  };
+
   return (
     <>
-      <button onClick={undo}>Undo</button>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: 16,
+        }}
+      >
+        <button onClick={undo}>Undo</button>
+        <button onClick={clear}>Clear</button>
+      </div>
       <div style={{ position: "relative" }}>
         <img
           src={BuildingImage}
@@ -56,7 +69,6 @@ function App() {
             <Shape
               sceneFunc={function (context, shape) {
                 context.beginPath();
-                // context.moveTo(0, 0);
                 coords.forEach(({ x, y }) => {
                   context.lineTo(x, y);
                 });
