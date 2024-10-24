@@ -2,6 +2,7 @@ import { Stage, Layer, Shape, Circle } from "react-konva";
 import "./App.css";
 import { useRef, useState } from "react";
 import BuildingImage from "./assets/building.jpg";
+import { exportStageSVG } from "./lib/export-to-svg";
 
 type Shape = {
   points: { x: number; y: number }[];
@@ -47,6 +48,36 @@ function App() {
     }
   };
 
+  const exportToSvg = async () => {
+    const stage = stageRef.current;
+    if (!stage) {
+      return;
+    }
+
+    const result = await exportStageSVG(stage, false);
+
+    try {
+      // @ts-expect-error window.showSaveFilePicker is not defined
+      const fileHandle = await window.showSaveFilePicker({
+        suggestedName: "building-floors.svg",
+        types: [
+          {
+            description: "SVG Files",
+            accept: {
+              "image/svg+xml": [".svg"],
+            },
+          },
+        ],
+      });
+
+      const writableStream = await fileHandle.createWritable();
+      await writableStream.write(result);
+      await writableStream.close();
+    } catch (error) {
+      console.error("Error saving file:", error);
+    }
+  };
+
   return (
     <div
       style={{ display: "flex", flexDirection: "column", gap: 16, padding: 16 }}
@@ -70,6 +101,7 @@ function App() {
         </label>
         <button onClick={undo}>Undo</button>
         <button onClick={clear}>Clear</button>
+        <button onClick={exportToSvg}>Export to svg</button>
       </div>
       <div style={{ position: "relative", border: "2px solid lightgrey" }}>
         <img
